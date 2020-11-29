@@ -17,7 +17,29 @@ un_data <- read_csv("UNVotes.csv", col_types = cols(
   unres = col_character(),
   short = col_character(),
   descr = col_character()
-))
+)) %>%
+  
+  # Countryname is inconsistently used (not for the 2019 data) as the column
+  # for the full name of the UNGA country, but this flaw was noticed late in 
+  # my project, thus I use the ccodes data below to replace the Countryname
+  # column with a more consistent format
+  
+  select(-Countryname)
+
+# country codes information from the Correlates of War project. The UN database
+# uses their codes consistently but is inconsistent with which column the country 
+# names are displayed in. So I use the COW country names associated with each
+# instance of the matching country code in the UN database for state names.
+
+ccodes <- read_csv("./COW_country_codes.csv",
+                   col_types = cols(
+                     StateAbb = col_character(),
+                     CCode = col_double(),
+                     StateNme = col_character()
+                   )) %>%
+  rename(ccode = CCode, Countryname = StateNme)
+
+code_data <- full_join(un_data, ccodes, by = c("ccode"))
 
 # describe where I get the data, when I got the data,
 # what flaws there might be
@@ -40,7 +62,7 @@ SubSah_list <- c("Angola", "Benin", "Botswana", "Burkina Faso", "Burundi",
                  "Central African Rep.", "Central African Republic", "Chad",
                  "Congo, Republic of", "Congo", "Zanzibar", "Comoros", 
                  "Congo, Dem. Rep.", "Democratic Republic of the Congo", 
-                 "Côte d’Ivoire", "C�te D'Ivoire", 
+                 "Côte d’Ivoire", "C�te D'Ivoire", "Ivory Coast",
                  "Djibouti", "Equatorial Guinea", "Eritrea", "Ethiopia", 
                  "Gabon", "Gambia", "Gambia (Islamic Republic of the)", 
                  "Ghana", "Guinea", "Guinea-Bissau", "Guinea Bissau", 
@@ -54,6 +76,8 @@ SubSah_list <- c("Angola", "Benin", "Botswana", "Burkina Faso", "Burundi",
 CentAm_list <- c("Belize", "Costa Rica", "Cuba", "Dominican Republic", 
                  "El Salvador", "Barbados", "Dominica", "Grenada", "Saint Lucia",
                  "Saint Vincent and the Grenadines", "Antigua and Barbuda", 
+                 "Antigua & Barbuda", "St. Kitts and Nevis", "St. Lucia", 
+                 "St. Vincent and the Grenadines",
                  "Saint Kitts and Nevis", "Dominican Rep.", "Trinidad & Tobago",
                  "Guatemala", "Haiti", "Honduras", "Jamaica", 
                  "Mexico", "Nicaragua", "Panama", "Trinidad and Tobago", "Bahamas")
@@ -65,22 +89,22 @@ SouthAm_list <- c("Argentina", "Bolivia", "Brazil", "Chile", "Suriname",
 CentAs_list <- c("Kazakhstan", "Kyrgyzstan", "Tajikistan", 
                  "Turkmenistan", "Uzbekistan")
 EastAs_list <- c("China", "Japan", "Korea, North", "Democratic People's Republic of Korea",
-                 "Korea, South", "Republic of Korea", 
+                 "Korea, South", "Republic of Korea", "South Korea", "North Korea",
                  "Mongolia", "Taiwan", "Taiwan, Province of China")
 SouthAs_list <- c("Afghanistan", "Bangladesh", "India", "Nepal", "Pakistan",
                   "Sri Lanka", "Bhutan", "Maldives")
 SEAs_list <- c("Brunei", "Brunei Darussalam", "Cambodia", "Indonesia", 
                "Laos", "Lao People's Democratic Republic", 
-               "Malaysia", "Myanmar", 
+               "Malaysia", "Myanmar", "East Timor", "Vietnam",
                "Philippines", "Singapore", "Thailand", "Timor-Leste", "Viet Nam")
 Oceania_list <- c("Australia", "Fiji", "New Zealand", "Papua New Guinea", "Vanuatu",
                   "Solomon Islands", "Kiribati", "Tuvalu", "Tonga", "Nauru", 
                   "Marshall Islands", "Palau", "Micronesia (Federated States of)", 
-                  "Micronesia", "Samoa")
+                  "Micronesia", "Samoa", "Federated States of Micronesia")
 CentEur_list <- c("Albania", "Bosnia and Herzegovina", "Bosnia-Herzegovina", "Bulgaria", "Croatia", 
                   "Czechia", "Czechoslovakia", "Estonia", 
                   "German Democratic Republic", "German DR", "Hungary", 
-                  "The former Yugoslav Republic of Macedonia", 
+                  "The former Yugoslav Republic of Macedonia", "Macedonia", 
                   "Kosovo", "Latvia", "Lithuania", "Montenegro", "North Macedonia",
                   "Poland", "Romania", "Serbia", "Slovakia", "Slovenia", "Yugoslavia")
 EastEur_list <- c("Armenia", "Azerbaijan", "Belarus", 
@@ -92,13 +116,13 @@ WestEur_list <- c("Austria", "Belgium", "Cyprus", "Denmark", "Finland", "France"
                   "Spain", "Sweden", "Switzerland", 
                   "United Kingdom of Great Britain and Northern Ireland", "UK",
                   "Monaco", "Liechtenstein", "Andorra", "German Federal Republic",
-                  "Czech Republic", "San Marino")
+                  "Czech Republic", "San Marino", "United Kingdom")
 
 # used the above region list vectors in a case_when expression to add a new 
 # column of 'region' to the data set, and removed columns that wouldn't be 
 # used later on
 
-reg_un_data1 <- un_data %>%
+reg_un_data1 <- code_data %>%
   mutate(region = case_when(
     Countryname %in% MENA_list ~ "MENA",
     Countryname %in% SubSah_list ~ "SubSah", 
@@ -115,7 +139,7 @@ reg_un_data1 <- un_data %>%
     Countryname %in% WestEur_list ~ "WestEur",
     TRUE ~ "unclassified")) %>%
   filter(member == 1) %>%
-  select(-amend, -para, -descr, -Country, -ccode, -ident)
+  select(-amend, -para, -descr, -Country, -ccode, -ident, -StateAbb)
 
 # read_csv garbles Côte D'Ivoire because of its accent circonflèxe,
 # so we need to rewrite reg_un_data to include it
@@ -454,7 +478,13 @@ un_and_mil <- full_join(un_and_mil1, milit_data_prop, by = c("region", "year"))
 # un and military data including issue votes
 
 un_mil_issue1 <- full_join(topics_un_data, military_exp, by = c("region", "year"))
-un_mil_issue <- full_join(un_mil_issue1, milit_data_prop, by = c("region", "year"))
+
+# join the data with milit data proportion, also remove unclassified regions
+# because the cote d'ivoire NAs were never addressed earlier and for some reason
+# the 2019 votes were duplicated as unclassified in addition to "World"
+
+un_mil_issue <- full_join(un_mil_issue1, milit_data_prop, by = c("region", "year")) %>%
+  filter(region != "unclassified")
 
 # un and mil data including issues and country level, also renamed countries
 # in the clean_mil_ex data so they would map onto their corresponding ones in the
@@ -463,41 +493,28 @@ un_mil_issue <- full_join(un_mil_issue1, milit_data_prop, by = c("region", "year
 clean_mil_ex_c <- clean_mil_ex %>%
   mutate(country = 
            str_replace_all(country, 
-                           c("Cape Verde" = "Cabo Verde",
-                             "Central African Rep." = "Central African Republic",
+                           c("Central African Rep." = "Central African Republic",
                              "Congo, Republic of" = "Congo",
                              "Congo, Dem. Rep." = "Democratic Republic of the Congo",
-                             "Côte d'Ivoire" = "Côte D'Ivoire",
-                             "Gambia" = "Gambia (Islamic Republic of the)",
-                             "Guinea-Bissau" = "Guinea Bissau",
-                             "Iran" = "Iran (Islamic Republic of)",
-                             "Russia" = "Russian Federation",
-                             "Korea, South" = "Republic of Korea",
+                             "Côte d'Ivoire" = "Ivory Coast",
+                             "Korea, South" = "South Korea",
                              "Trinidad & Tobago" = "Trinidad and Tobago",
                              "USA" = "United States of America",
-                             "Bolivia" = "Bolivia (Plurinational State of)",
-                             "Venezuela" = "Venezuela, Bolivarian Republic of",
-                             "Brunei" = "Brunei Darussalam",
-                             "Laos" = "Lao People's Democratic Republic",
-                             "Korea, North" = "Democratic People's Republic of Korea",
+                             "Korea, North" = "North Korea",
                              "German DR" = "German Democratic Republic",
                              "Dominican Rep." = "Dominican Republic",
-                             "Tanzania" = "United Republic of Tanzania",
-                             "UK" = "United Kingdom of 
-                                Great Britain and Northern Ireland",
+                             "UK" = "United Kingdom",
                              "Czechia" = "Czech Republic",
-                             "Moldova" = "Republic of Moldova",
-                             "Syria" = "Syrian Arab Republic",
                              "UAE" = "United Arab Emirates",
                              "North Macedonia" = "The former Yugoslav 
                                Republic of Macedonia",
                              "Yemen, North" = "Yemen Arab Republic",
-                             "Eswatini" = "Swaziland",
-                             "Taiwan" = "Taiwan, Province of China")))
+                             "Eswatini" = "Swaziland")))
 
 
 country_mil_issue1 <- full_join(topic_percent_c, clean_mil_ex_c, 
-                                by = c("country", "year", "region"))
+                                by = c("country", "year", "region")) %>%
+    filter(region != "unclassified")
 
 country <- as.data.frame(country_mil_issue1)
 write_rds(country, "./country.rds")

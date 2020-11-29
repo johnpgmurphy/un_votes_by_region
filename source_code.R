@@ -4,7 +4,55 @@ library(tidyverse)
 library(dplyr)
 library(readxl)
 library(janitor)
+library(gtsummary)
+library(broom.mixed)
+library(gt)
+library(rstanarm)
+set.seed(193)
 
+## Preset Vectors ##
+
+region_input <- c("Middle East and North Africa" = "a", 
+                  "Sub Saharan Africa" = "b",
+                  "North America" = "d",
+                  "South America" = "e",
+                  "Central America" = "f", 
+                  "Central Asia" = "g", 
+                  "South Asia" = "h",
+                  "Southeast Asia" = "i",
+                  "East Asia" = "j",
+                  "Oceania" = "k",
+                  "Central Europe" = "l",
+                  "Western Europe" = "m",
+                  "Eastern Europe" = "n")
+
+region_w_input <- c("World" = "o",
+                    "Middle East and North Africa" = "a", 
+                    "Sub Saharan Africa" = "b",
+                    "North America" = "d",
+                    "South America" = "e",
+                    "Central America" = "f", 
+                    "Central Asia" = "g", 
+                    "South Asia" = "h",
+                    "Southeast Asia" = "i",
+                    "East Asia" = "j",
+                    "Oceania" = "k",
+                    "Central Europe" = "l",
+                    "Western Europe" = "m",
+                    "Eastern Europe" = "n")
+
+vote_input <- c("Yes Votes" = "a",
+                "No Votes" = "b",
+                "Abstentions" = "c",
+                "Absences" = "d")
+
+issue_input <- c("All Resolutions" = "g",
+                "Israel/Palestine" = "a",
+                "Nuclear Weapons" = "b",
+                "Arms Control" = "c",
+                "Colonialism" = "d",
+                "Human Rights" = "e",
+                "Economic Development" = "f")
 
 ###### Functions #####
 
@@ -146,4 +194,15 @@ c_issue_filter <- function(data = data, input = input){
                 mil_ex_gdp = 100*mean(mil_ex_gdp),
                 .groups = "drop")}
   return(x)
+}
+
+# Issue Case When
+issue_fct <- function(input = input){
+  x <- case_when(
+  input == "a" ~ `percent_yes`,
+  input == "b" ~ `percent_no`,
+  input == "c" ~ `percent_abstain`,
+  input == "d" ~ `percent_absent`,
+  TRUE ~ `percent_yes`)
+  return(`x`)
 }
