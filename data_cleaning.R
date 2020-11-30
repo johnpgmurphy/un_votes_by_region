@@ -8,6 +8,9 @@ library(janitor)
 # of its accent circonflexe, though I address this below. Another major issue
 # is that the data set does not include Countryname for the "emergency special
 # sessions," and so the voting data from those gets lost for not having a region
+# Also the 2019 data is wrongly coded; the Countryname is listed in the wrong
+# column. Finally, there is no data from 1964 (though this isn't a flaw in the
+# data, but due to historical events).
 
 un_data <- read_csv("UNVotes.csv", col_types = cols(
   .default = col_double(),
@@ -41,8 +44,18 @@ ccodes <- read_csv("./COW_country_codes.csv",
 
 code_data <- full_join(un_data, ccodes, by = c("ccode"))
 
-# describe where I get the data, when I got the data,
-# what flaws there might be
+# I got the military expenditure data from the SIPRI military expenditure database
+# SIPRI being the Stockholm International Peace Research Institute. I chose their
+# % GDP format, as they had multiple options and I thought it allowed for the
+# best comparability, as opposed to dollar values, wherein the US' spending, when
+# plotted as the size of a dot, would eclipse the whole graph. This was downloaded
+# in October 2020. I'm planning to overlay the military data on top of the 
+# voting patterns on regional and country-levels.
+# One flaw with the data is that no-value cells in the database contained x's, 
+# rather than being empty. Another is that the country names don't match
+# up with the COW name list. Also, when using the data for mean regional spending,
+# the data is less reliable because few regions fully report military spending
+# in any year.
 
 mil_ex <- read_excel("SIPRI_simple_milex.xlsx", skip = 0) %>%
   clean_names() %>%
@@ -473,15 +486,16 @@ milit_data_prop <- full_join(world_data_prop, region_data_prop,
 
 un_and_mil1 <- full_join(un_votes, military_exp, by = c("region", "year"))
 
+# adding milit_data_prop gives us the reliability column for each region for each
+# year
+
 un_and_mil <- full_join(un_and_mil1, milit_data_prop, by = c("region", "year"))
 
 # un and military data including issue votes
 
 un_mil_issue1 <- full_join(topics_un_data, military_exp, by = c("region", "year"))
 
-# join the data with milit data proportion, also remove unclassified regions
-# because the cote d'ivoire NAs were never addressed earlier and for some reason
-# the 2019 votes were duplicated as unclassified in addition to "World"
+# join the data with milit data proportion
 
 un_mil_issue <- full_join(un_mil_issue1, milit_data_prop, by = c("region", "year")) %>%
   filter(region != "unclassified")
@@ -511,13 +525,19 @@ clean_mil_ex_c <- clean_mil_ex %>%
                              "Yemen, North" = "Yemen Arab Republic",
                              "Eswatini" = "Swaziland")))
 
+# join the country level topic voting data with the country-level military
+# expenditure data, as reliability no longer needs to be measured
 
 country_mil_issue1 <- full_join(topic_percent_c, clean_mil_ex_c, 
                                 by = c("country", "year", "region")) %>%
     filter(region != "unclassified")
 
+# write country_mil_issue1 as a .rds file so it's compressed and uploadable
+
 country <- as.data.frame(country_mil_issue1)
 write_rds(country, "./country.rds")
+
+# write un_mil_issue as a .rds file so it's compressed and uploadable
 
 region <- as.data.frame(un_mil_issue)
 write_rds(region, "./region.rds")
