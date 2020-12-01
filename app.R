@@ -1,11 +1,15 @@
 
-#Source code:
+# Source code:
 
 source("source_code.R")
 country_mil_issue1 <- read_rds("./country.rds")
 un_mil_issue <- read_rds("./region.rds")
 
-# Define UI for application that draws a plot with two lines with overlaid points
+# Define UI for application that is interactive and creates two plots:
+# one that lets the user compare regions on UNGA voting trends with a choice
+# of vote type and issue topic (and overlays military expenditures), and one
+# which does the same on a country level. It also presents a table of results from
+# a predictive statistical model for regional voting habits.
 
 ui <- navbarPage(
     "UNGA Regional Voting Patterns",
