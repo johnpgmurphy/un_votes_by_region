@@ -2,8 +2,9 @@ library(tidyverse)
 library(readxl)
 library(janitor)
 
-# describe where I get the data, when I get the data, what's in the data
-# what flaws are in the data, what I plan to do with the data
+# The UN dataset comes from the 'United Nations General Assembly Voting Data' 
+# database put together by Erik Voeten, Anton Strezhnev, and Michael Bailey first
+# in 2009.
 # Notable flaws: Côte D'Ivoire doesn't get read in properly with read_csv because
 # of its accent circonflexe, though I address this below. Another major issue
 # is that the data set does not include Countryname for the "emergency special
@@ -11,6 +12,7 @@ library(janitor)
 # Also the 2019 data is wrongly coded; the Countryname is listed in the wrong
 # column. Finally, there is no data from 1964 (though this isn't a flaw in the
 # data, but due to historical events).
+
 
 un_data <- read_csv("UNVotes.csv", col_types = cols(
   .default = col_double(),
@@ -25,7 +27,9 @@ un_data <- read_csv("UNVotes.csv", col_types = cols(
   # Countryname is inconsistently used (not for the 2019 data) as the column
   # for the full name of the UNGA country, but this flaw was noticed late in 
   # my project, thus I use the ccodes data below to replace the Countryname
-  # column with a more consistent format
+  # column with a more consistent format. This also is a work-around for R not
+  # handling côte d'ivoire well, since it uses the code number and then labels
+  # the country as Ivory Coast.
   
   select(-Countryname)
 
@@ -61,7 +65,7 @@ mil_ex <- read_excel("SIPRI_simple_milex.xlsx", skip = 0) %>%
   clean_names() %>%
   rename_with(~ str_replace(., "x", "")) 
 
-#Region Vectors
+# Region Vectors
 
 MENA_list <- c("Bahrain", "Egypt", "Iran", "Iran (Islamic Republic of)",
                "Iraq", "Israel", "Jordan", 
@@ -135,7 +139,7 @@ WestEur_list <- c("Austria", "Belgium", "Cyprus", "Denmark", "Finland", "France"
 # column of 'region' to the data set, and removed columns that wouldn't be 
 # used later on
 
-reg_un_data1 <- code_data %>%
+reg_un_data <- code_data %>%
   mutate(region = case_when(
     Countryname %in% MENA_list ~ "MENA",
     Countryname %in% SubSah_list ~ "SubSah", 
@@ -153,22 +157,6 @@ reg_un_data1 <- code_data %>%
     TRUE ~ "unclassified")) %>%
   filter(member == 1) %>%
   select(-amend, -para, -descr, -Country, -ccode, -ident, -StateAbb)
-
-# read_csv garbles Côte D'Ivoire because of its accent circonflèxe,
-# so we need to rewrite reg_un_data to include it
-
-ivory_coast <- reg_un_data1 %>% 
-  filter(region == "unclassified") %>% 
-  filter(Countryname != "NA") %>% 
-  mutate(Countryname = "Côte D'Ivoire", region = "SubSah")
-
-# then join them together
-
-reg_un_data <- full_join(reg_un_data1, ivory_coast, by = 
-                           c("rcid", "member", "vote", "Countryname", "year", 
-                             "session", "abstain", "yes", "no", "importantvote", 
-                             "date", "unres", "short", "me", "nu", 
-                             "di", "hr", "co", "ec", "resid", "region"))
 
 # condense the reg_un_data into regional data based on the inputted categories
 # I also thought a count of members/region per year would be handy, so that was 
@@ -426,34 +414,6 @@ military_exp <- full_join(milit_ex_1, world_milit_ex_mean,
 
 region_count <- reg_votes_by_year %>%
   select(region, year, members)
-
-mil_ex_members <- full_join(region_count, clean_mil_ex, by = c("region", "year"))
-
-# no longer using the below 1 2 and 3 because the 1964 data is not usable
-
-mil_ex_members1 <- mil_ex_members %>% filter(year != 1964)
-
-mil_ex_members2 <- mil_ex_members1 %>% filter(year == 1964) %>%
-  mutate(members = case_when(
-    region == "MENA" ~ 15,
-    region == "SubSah" ~ 31, 
-    region == "CentAm" ~ 12,
-    region == "NorAm" ~ 2,
-    region == "SouthAm" ~ 10,
-    region == "CentAs" ~ 0,
-    region == "EastAs" ~ 3,
-    region == "SouthAs" ~ 5,
-    region == "SEAs" ~ 7,
-    region == "Oceania" ~ 2,
-    region == "CentEur" ~ 7,
-    region == "EastEur" ~ 3,
-    region == "WestEur" ~ 18,
-    TRUE ~ 0))
-
-mil_ex_members3 <- full_join(mil_ex_members2, mil_ex_members1, 
-                             by = c("region", "year", "country", "members",
-                                    "mil_ex_gdp")) %>%
-  arrange(.$year)
 
 # join the data sets so clean_mil_ex has UN member counts per year
 

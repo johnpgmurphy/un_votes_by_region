@@ -18,66 +18,84 @@ ui <- navbarPage(
                                selectInput(
                                    "region_1",
                                    "Region 1",
-                                   c("Middle East and North Africa" = "a", 
-                                     "Sub Saharan Africa" = "b",
-                                     "North America" = "d",
-                                     "South America" = "e",
-                                     "Central America" = "f", 
-                                     "Central Asia" = "g", 
-                                     "South Asia" = "h",
-                                     "Southeast Asia" = "i",
-                                     "East Asia" = "j",
-                                     "Oceania" = "k",
-                                     "Central Europe" = "l",
-                                     "Western Europe" = "m",
-                                     "Eastern Europe" = "n",
-                                     "World" = "o")
+                                   c("Middle East and North Africa" 
+                                     = "MENA", 
+                                     "Sub Saharan Africa" = "SubSah",
+                                     "North America" = "NorAm",
+                                     "South America" = "SouthAm",
+                                     "Central America" = "CentAm", 
+                                     "Central Asia" = "CentAs", 
+                                     "South Asia" = "SouthAs",
+                                     "Southeast Asia" = "SEAs",
+                                     "East Asia" = "EastAs",
+                                     "Oceania" = "Oceania",
+                                     "Central Europe" = "CentEur",
+                                     "Western Europe" = "WestEur",
+                                     "Eastern Europe" = "EastEur",
+                                     "World" = "World")
                                ),
                                selectInput(
                                    "region_2",
                                    "Region 2",
-                                   c("World" = "o",
-                                     "Middle East and North Africa" = "a", 
-                                     "Sub Saharan Africa" = "b",
-                                     "North America" = "d",
-                                     "South America" = "e",
-                                     "Central America" = "f", 
-                                     "Central Asia" = "g", 
-                                     "South Asia" = "h",
-                                     "Southeast Asia" = "i",
-                                     "East Asia" = "j",
-                                     "Oceania" = "k",
-                                     "Central Europe" = "l",
-                                     "Western Europe" = "m",
-                                     "Eastern Europe" = "n")
+                                   c("World" = "World",
+                                     "Middle East and North Africa" 
+                                     = "MENA", 
+                                     "Sub Saharan Africa" = "SubSah",
+                                     "North America" = "NorAm",
+                                     "South America" = "SouthAm",
+                                     "Central America" = "CentAm", 
+                                     "Central Asia" = "CentAs", 
+                                     "South Asia" = "SouthAs",
+                                     "Southeast Asia" = "SEAs",
+                                     "East Asia" = "EastAs",
+                                     "Oceania" = "Oceania",
+                                     "Central Europe" = "CentEur",
+                                     "Western Europe" = "WestEur",
+                                     "Eastern Europe" = "EastEur")
                                ),
                                selectInput(
                                    "vote_type_r",
                                    "Vote Type",
-                                   c("Yes Votes" = "a",
-                                     "No Votes" = "b",
-                                     "Abstentions" = "c",
-                                     "Absences" = "d")
+                                   c("Yes Votes" = "yes",
+                                     "No Votes" = "no",
+                                     "Abstentions" = "abstain",
+                                     "Absences" = "absent")
                                ),
                                selectInput(
                                    "issue_r",
                                    "Issue",
-                                   c("All Resolutions" = "g",
-                                     "Israel/Palestine" = "a",
-                                     "Nuclear Weapons" = "b",
-                                     "Arms Control" = "c",
-                                     "Colonialism" = "d",
-                                     "Human Rights" = "e",
-                                     "Economic Development" = "f")
+                                   c("All Resolutions" = "all",
+                                     "Israel/Palestine" = "isrpal",
+                                     "Nuclear Weapons" = "nukes",
+                                     "Arms Control" = "arms",
+                                     "Colonialism" = "colony",
+                                     "Human Rights" = "rights",
+                                     "Economic Development" = "dev")
                                )
                                
-                               #decided against having an input for military 
-                               #expenditure as mean or median as it seemed
-                               #superfluous, stuck with mean_mil_ex to take
-                               #into account outlier years as outliers are relevant
+                               # decided against having an input for military 
+                               # expenditure as mean or median as it seemed
+                               # superfluous, stuck with mean_mil_ex to take
+                               # into account outlier years as outliers are relevant
                                
                                ),
-                           mainPanel(plotOutput("region_comp")))
+                           mainPanel(plotOutput("region_comp"))),
+                       p("This chart lets you compare the voting habits of two
+                         geographic regions in the UN General Assembly, as well
+                         as compare their military expenditures. The data for
+                         government spending on military budgets isn't 100% 
+                         complete due to varying degrees of transparency,
+                         so be aware that the opacity of the points in the graph
+                         are tied to how much military data we have for that 
+                         region in that year."),
+                       p("See how much consensus there is within regions by
+                         checking whether their votes are coordinated or not 
+                         (i.e. if >75% (or <25%) of votes cast by a whole region in a year
+                         are yes votes, then that indicates some consensus, but if
+                         only 50% of votes cast were yes votes, then there were 
+                         clearly differing views on the topics being voted on).
+                         Try comparing Oceania to Southeast Asia to see an 
+                         example (especially for 1970 onwards).")
              )),
     tabPanel("Country Comparison",
              fluidPage(theme = shinytheme("cerulean"),
@@ -86,40 +104,49 @@ ui <- navbarPage(
                            sidebarPanel(
                                selectInput("region_c",
                                            "Region",
-                                           c("Middle East and North Africa" = "a", 
-                                             "Sub Saharan Africa" = "b",
-                                             "North America" = "d",
-                                             "South America" = "e",
-                                             "Central America" = "f", 
-                                             "Central Asia" = "g", 
-                                             "South Asia" = "h",
-                                             "Southeast Asia" = "i",
-                                             "East Asia" = "j",
-                                             "Oceania" = "k",
-                                             "Central Europe" = "l",
-                                             "Western Europe" = "m",
-                                             "Eastern Europe" = "n")),
+                                           c("Middle East and North Africa" 
+                                             = "MENA", 
+                                             "Sub Saharan Africa" = "SubSah",
+                                             "North America" = "NorAm",
+                                             "South America" = "SouthAm",
+                                             "Central America" = "CentAm", 
+                                             "Central Asia" = "CentAs", 
+                                             "South Asia" = "SouthAs",
+                                             "Southeast Asia" = "SEAs",
+                                             "East Asia" = "EastAs",
+                                             "Oceania" = "Oceania",
+                                             "Central Europe" = "CentEur",
+                                             "Western Europe" = "WestEur",
+                                             "Eastern Europe" = "EastEur")),
                                uiOutput("countrylist_1"),
                                uiOutput("countrylist_2"),
                                selectInput(
                                    "vote_type_c",
                                    "Vote Type",
-                                   c("Yes Votes" = "a",
-                                     "No Votes" = "b",
-                                     "Abstentions" = "c",
-                                     "Absences" = "d")
+                                   c("Yes Votes" = "yes",
+                                    "No Votes" = "no",
+                                    "Abstentions" = "abstain",
+                                    "Absences" = "absent")
                                ),
                                selectInput(
                                    "issue_c",
                                    "Issue",
-                                   c("All Resolutions" = "g",
-                                     "Israel/Palestine" = "a",
-                                     "Nuclear Weapons" = "b",
-                                     "Arms Control" = "c",
-                                     "Colonialism" = "d",
-                                     "Human Rights" = "e",
-                                     "Economic Development" = "f"))),
-                               mainPanel(plotOutput("country_plot")))
+                                   c("All Resolutions" = "all",
+                                     "Israel/Palestine" = "isrpal",
+                                     "Nuclear Weapons" = "nukes",
+                                     "Arms Control" = "arms",
+                                     "Colonialism" = "colony",
+                                     "Human Rights" = "rights",
+                                     "Economic Development" = "dev"))),
+                               mainPanel(plotOutput("country_plot"))),
+                       p("This chart lets you compare two countries from the
+                         same geographic region on their voting habits over
+                         time in the UN General Assembly, as well as on
+                         their military expenditures (where data is available).
+                         Play with the toggles to see which countries vote
+                         yes or no more frequently (or abstain or are absent 
+                         from votes) in the UNGA, and how their voting records
+                         compare on specific issues.")
                            )),
     tabPanel("Statistical Model",
             fluidPage(theme = shinytheme("cerulean"),
@@ -130,36 +157,37 @@ ui <- navbarPage(
                           sidebarPanel(
                               selectInput("region_model",
                                           "Region",
-                                          c("Middle East and North Africa" = "a", 
-                                            "Sub Saharan Africa" = "b",
-                                            "North America" = "d",
-                                            "South America" = "e",
-                                            "Central America" = "f", 
-                                            "Central Asia" = "g", 
-                                            "South Asia" = "h",
-                                            "Southeast Asia" = "i",
-                                            "East Asia" = "j",
-                                            "Oceania" = "k",
-                                            "Central Europe" = "l",
-                                            "Western Europe" = "m",
-                                            "Eastern Europe" = "n")),
+                                          c("Middle East and North Africa" 
+                                            = "MENA", 
+                                            "Sub Saharan Africa" = "SubSah",
+                                            "North America" = "NorAm",
+                                            "South America" = "SouthAm",
+                                            "Central America" = "CentAm", 
+                                            "Central Asia" = "CentAs", 
+                                            "South Asia" = "SouthAs",
+                                            "Southeast Asia" = "SEAs",
+                                            "East Asia" = "EastAs",
+                                            "Oceania" = "Oceania",
+                                            "Central Europe" = "CentEur",
+                                            "Western Europe" = "WestEur",
+                                            "Eastern Europe" = "EastEur")),
                               selectInput(
                                   "vote_type_model",
                                   "Vote Type",
-                                  c("Yes Votes" = "a",
-                                    "No Votes" = "b",
-                                    "Abstentions" = "c",
-                                    "Absences" = "d")),
+                                  c("Yes Votes" = "yes",
+                                    "No Votes" = "no",
+                                    "Abstentions" = "abstain",
+                                    "Absences" = "absent")),
                               selectInput(
                                   "issue_model",
                                   "Issue",
-                                  c("All Resolutions" = "g",
-                                    "Israel/Palestine" = "a",
-                                    "Nuclear Weapons" = "b",
-                                    "Arms Control" = "c",
-                                    "Colonialism" = "d",
-                                    "Human Rights" = "e",
-                                    "Economic Development" = "f"))),
+                                  c("All Resolutions" = "all",
+                                    "Israel/Palestine" = "isrpal",
+                                    "Nuclear Weapons" = "nukes",
+                                    "Arms Control" = "arms",
+                                    "Colonialism" = "colony",
+                                    "Human Rights" = "rights",
+                                    "Economic Development" = "dev"))),
                           mainPanel(gt_output("model_table")
                                     )),
                       h3("Interpreting the Model"),
@@ -275,8 +303,9 @@ ui <- navbarPage(
                about the relationship between voting habits in the UNGA
                and military expenditure could be drawn, whether at the regional
                or national level."),
-             p("A link to the GitHub repo to consult the code:
-               https://github.com/johnpgmurphy/un_votes_by_region"),
+             p("A link to the GitHub repo to consult the code:",
+               tags$a(href= "https://github.com/johnpgmurphy/un_votes_by_region",
+                      "click here.")),
              h3("About Me"),
              p("My name is Jack Murphy and I am a second-year Master's student
              in Harvard's Regional Studies - Middle East program. I'm interested
@@ -310,10 +339,10 @@ server <- function(input, output) {
  
             ggplot(filtered_r_i, aes(x = year, 
                           y = case_when(
-                              input$vote_type_r == "a" ~ percent_yes,
-                              input$vote_type_r == "b" ~ percent_no,
-                              input$vote_type_r == "c" ~ percent_abstain,
-                              input$vote_type_r == "d" ~ percent_absent,
+                              input$vote_type_r == "yes" ~ percent_yes,
+                              input$vote_type_r == "no" ~ percent_no,
+                              input$vote_type_r == "abstain" ~ percent_abstain,
+                              input$vote_type_r == "absent" ~ percent_absent,
                               TRUE ~ percent_yes),
                           color = region)) +
                 geom_line() +
@@ -376,10 +405,10 @@ server <- function(input, output) {
         
         ggplot(x, aes(x = year, 
                       y = case_when(
-                          input$vote_type_c == "a" ~ percent_yes,
-                          input$vote_type_c == "b" ~ percent_no,
-                          input$vote_type_c == "c" ~ percent_abstain,
-                          input$vote_type_c == "d" ~ percent_absent,
+                          input$vote_type_c == "yes" ~ percent_yes,
+                          input$vote_type_c == "no" ~ percent_no,
+                          input$vote_type_c == "abstain" ~ percent_abstain,
+                          input$vote_type_c == "absent" ~ percent_absent,
                           TRUE ~ percent_yes),
                       color = country)) +
             geom_line() +
@@ -414,10 +443,10 @@ server <- function(input, output) {
             mutate(region = fct_relevel(region, "World"))
         
         model <- stan_glm(case_when(
-            input$vote_type_model == "a" ~ percent_yes,
-            input$vote_type_model == "b" ~ percent_no,
-            input$vote_type_model == "c" ~ percent_abstain,
-            input$vote_type_model == "d" ~ percent_absent,
+            input$vote_type_model == "yes" ~ percent_yes,
+            input$vote_type_model == "no" ~ percent_no,
+            input$vote_type_model == "abstain" ~ percent_abstain,
+            input$vote_type_model == "absent" ~ percent_absent,
             TRUE ~ percent_yes) ~ 
                               region + avg_mil_ex + region*avg_mil_ex,
                            refresh = 0,
