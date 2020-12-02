@@ -439,7 +439,7 @@ server <- function(input, output) {
     output$model_table <- render_gt({
         model_filtered_r <- two_region_filter(data = un_mil_issue, 
                                input1 = input$region_model,
-                               input2 = "o")
+                               input2 = "World")
         model_filtered_i <- reg_issue_filter(data = model_filtered_r, input = input$issue_model)
         
         x <- model_filtered_i %>%
