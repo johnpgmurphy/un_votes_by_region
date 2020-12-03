@@ -32,6 +32,8 @@ un_data <- read_csv("UNVotes.csv", col_types = cols(
   # the country as Ivory Coast.
   
   select(-Countryname)
+  
+  
 
 # country codes information from the Correlates of War project. The UN database
 # uses their codes consistently but is inconsistent with which column the country 
@@ -44,7 +46,13 @@ ccodes <- read_csv("./COW_country_codes.csv",
                      CCode = col_double(),
                      StateNme = col_character()
                    )) %>%
-  rename(ccode = CCode, Countryname = StateNme)
+  rename(ccode = CCode, Countryname = StateNme) %>%
+  
+  # ccodes for some reason has duplicate rows for some countries which 
+  # messes up summarize functions down the line, distinct() from the dplyr
+  # package removes duplicates
+  
+  distinct()
 
 code_data <- full_join(un_data, ccodes, by = c("ccode"))
 

@@ -90,7 +90,7 @@ reg_issue_filter <- function(data = data, input = input){
                        percent_abstain = weighted.mean(percent_abstain, n_unres),
                        percent_absent = weighted.mean(percent_absent, n_unres),
                        n_unres = sum(n_unres),
-                       avg_mil_ex = mean(avg_mil_ex),
+                       avg_mil_ex = mean(avg_mil_ex, na.rm = TRUE),
                        prop_has_data = mean(prop_has_data),
                        .groups = "drop")}
     if(input != "all"){
@@ -108,7 +108,7 @@ reg_issue_filter <- function(data = data, input = input){
               percent_abstain = weighted.mean(percent_abstain, n_unres),
               percent_absent = weighted.mean(percent_absent, n_unres),
               n_unres = sum(n_unres),
-              avg_mil_ex = mean(avg_mil_ex),
+              avg_mil_ex = mean(avg_mil_ex, na.rm = TRUE),
               prop_has_data = mean(prop_has_data),
               .groups = "drop")}
   return(x)
@@ -130,7 +130,7 @@ c_issue_filter <- function(data = data, input = input){
                 percent_abstain = weighted.mean(percent_abstain, n_unres),
                 percent_absent = weighted.mean(percent_absent, n_unres),
                 n_unres = sum(n_unres),
-                mil_ex_gdp = 100*mean(mil_ex_gdp),
+                mil_ex_gdp = 100*mean(mil_ex_gdp, na.rm = TRUE),
                 .groups = "drop")}
   if(input != "all"){
     x <- data %>%
@@ -147,7 +147,7 @@ c_issue_filter <- function(data = data, input = input){
                 percent_abstain = weighted.mean(percent_abstain, n_unres),
                 percent_absent = weighted.mean(percent_absent, n_unres),
                 n_unres = sum(n_unres),
-                mil_ex_gdp = 100*mean(mil_ex_gdp),
+                mil_ex_gdp = 100*mean(mil_ex_gdp, na.rm = TRUE),
                 .groups = "drop")}
   return(x)
 }

@@ -336,7 +336,8 @@ server <- function(input, output) {
               # filter further to specific issues as determined by input$issue
               # using custom issue_filter function 
               
-              filtered_r_i <- reg_issue_filter(data = region_filtered, input = input$issue_r)
+              filtered_r_i <- reg_issue_filter(data = region_filtered, 
+                                               input = input$issue_r)
               
             # plot the filtered dataset in ggplot, allow the selected input$vote_type
             # input to dictate which column is used for the y-axis
@@ -401,8 +402,11 @@ server <- function(input, output) {
     # and then to the selected issue
     
     output$country_plot <- renderPlot({
-        filtered_r_c <- one_region_filter(data = country_mil_issue1, input1 = input$region_c)
-        filtered_r_c2 <- filtered_r_c %>% filter(country %in% c(input$country_1, input$country_2))
+        filtered_r_c <- one_region_filter(data = country_mil_issue1, 
+                                          input1 = input$region_c)
+        filtered_r_c2 <- filtered_r_c %>% 
+            filter(country %in% c(input$country_1, input$country_2))
+        
         x <- c_issue_filter(data = filtered_r_c2, input$issue_c)
         
         # modify y axis according to selected vote type
@@ -440,7 +444,8 @@ server <- function(input, output) {
         model_filtered_r <- two_region_filter(data = un_mil_issue, 
                                input1 = input$region_model,
                                input2 = "World")
-        model_filtered_i <- reg_issue_filter(data = model_filtered_r, input = input$issue_model)
+        model_filtered_i <- reg_issue_filter(data = model_filtered_r, 
+                                             input = input$issue_model)
         
         x <- model_filtered_i %>%
             mutate(region = as.factor(region)) %>%
