@@ -366,8 +366,8 @@ server <- function(input, output) {
                                    breaks = c(seq(0, 1, 0.1))) +
                 scale_x_continuous(breaks = c(seq(1950, 2020, 10))) +
                 scale_size_continuous(name = "Defense\nExpenditures\nas % GDP", 
-                                    breaks = c(seq(0, 12, 2)),
-                                    limits = c(0, 10)) +
+                                    breaks = c(seq(0, 12, 3)),
+                                    limits = c(0, 12)) +
                 scale_alpha(name = "Expenditure\nReliability", 
                             breaks = c(seq(0.25, 1, 0.25)),
                             limits = c(0, 1)) +
