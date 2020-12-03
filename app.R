@@ -121,7 +121,8 @@ ui <- navbarPage(
                                              "Oceania" = "Oceania",
                                              "Central Europe" = "CentEur",
                                              "Western Europe" = "WestEur",
-                                             "Eastern Europe" = "EastEur")),
+                                             "Eastern Europe" = "EastEur",
+                                             "World" = "all")),
                                uiOutput("countrylist_1"),
                                uiOutput("countrylist_2"),
                                selectInput(
@@ -379,7 +380,8 @@ server <- function(input, output) {
     # depending on what region is selected
     
     output$countrylist_1 <- renderUI({
-        filtered_reg1 <- one_region_filter(data = country_mil_issue1, input1 = input$region_c)
+        filtered_reg1 <- one_region_filter(data = country_mil_issue1, 
+                                           input1 = input$region_c)
         c_list_1 <- unique(filtered_reg1$country) %>% sort()
         selectInput("country_1",
                     "Country 1",
@@ -391,7 +393,8 @@ server <- function(input, output) {
     # so that it doesn't default to the same country as the previous one
     
     output$countrylist_2 <- renderUI({
-        filtered_reg2 <- one_region_filter(data = country_mil_issue1, input1 = input$region_c)
+        filtered_reg2 <- one_region_filter(data = country_mil_issue1, 
+                                           input1 = input$region_c)
         c_list_2 <- unique(filtered_reg2$country) %>% sort(., decreasing = TRUE)
         selectInput("country_2",
                     "Country 2",
@@ -441,6 +444,7 @@ server <- function(input, output) {
     })
     
     output$model_table <- render_gt({
+
         model_filtered_r <- two_region_filter(data = un_mil_issue, 
                                input1 = input$region_model,
                                input2 = "World")

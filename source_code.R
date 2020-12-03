@@ -55,7 +55,8 @@ two_region_filter <- function(data = data,
 
 one_region_filter <- function(data = data, 
                               input1 = input1){            
-  data %>%
+  if(input1 != "all"){
+    x <- data %>%
     filter(region == case_when(
       input1 == "MENA" ~ "MENA",
       input1 == "World"  ~ "World",
@@ -72,6 +73,11 @@ one_region_filter <- function(data = data,
       input1 == "EastEur" ~ "EastEur",
       input1 == "WestEur" ~ "WestEur"
     ))}
+    if(input1 == "all"){
+    x <- data
+    }
+    return(x)
+      }
 
 # a function that filters a dataset by inputted issue codes
 # and returns the weighted proportions of votes for regions
