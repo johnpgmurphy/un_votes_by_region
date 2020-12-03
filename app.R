@@ -367,8 +367,8 @@ server <- function(input, output) {
                                    breaks = c(seq(0, 1, 0.1))) +
                 scale_x_continuous(breaks = c(seq(1950, 2020, 10))) +
                 scale_size_continuous(name = "Defense\nExpenditures\nas % GDP", 
-                                    breaks = c(seq(0, 12, 3)),
-                                    limits = c(0, 12)) +
+                                      breaks = c(seq(0, 12, 3)),
+                                      limits = c(0, 12)) +
                 scale_alpha(name = "Expenditure\nReliability", 
                             breaks = c(seq(0.25, 1, 0.25)),
                             limits = c(0, 1)) +
@@ -436,9 +436,7 @@ server <- function(input, output) {
             scale_y_continuous(name = "Vote Proportion", 
                                breaks = c(seq(0, 1, 0.1))) +
             scale_x_continuous(breaks = c(seq(1950, 2020, 10))) +
-            scale_size_continuous(name = "Defense\nExpenditures\nas % GDP", 
-                                  breaks = c(seq(0, 12, 3)),
-                                  limits = c(0, 12)) +
+            scale_size_continuous(name = "Defense\nExpenditures\nas % GDP") +
             scale_color_discrete(name = "Countries") +
             theme_bw()
     })
