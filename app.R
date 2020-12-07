@@ -148,7 +148,8 @@ ui <- navbarPage(
                          same geographic region on their voting habits over
                          time in the UN General Assembly, as well as on
                          their military expenditures (where data is available).
-                         Play with the toggles to see which countries vote
+                         Or pick the 'World' region to compare any two countries."),
+                       p("Play with the toggles to see which countries vote
                          yes or no more frequently (or abstain or are absent 
                          from votes) in the UNGA, and how their voting records
                          compare on specific issues.")

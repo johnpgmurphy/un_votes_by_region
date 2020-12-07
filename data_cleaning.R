@@ -127,21 +127,22 @@ Oceania_list <- c("Australia", "Fiji", "New Zealand", "Papua New Guinea", "Vanua
                   "Marshall Islands", "Palau", "Micronesia (Federated States of)", 
                   "Micronesia", "Samoa", "Federated States of Micronesia")
 CentEur_list <- c("Albania", "Bosnia and Herzegovina", "Bosnia-Herzegovina", "Bulgaria", "Croatia", 
-                  "Czechia", "Czechoslovakia", "Estonia", 
+                  "Czechoslovakia", "Estonia", 
                   "German Democratic Republic", "German DR", "Hungary", 
                   "The former Yugoslav Republic of Macedonia", "Macedonia", 
                   "Kosovo", "Latvia", "Lithuania", "Montenegro", "North Macedonia",
+                  "Czech Republic",
                   "Poland", "Romania", "Serbia", "Slovakia", "Slovenia", "Yugoslavia")
 EastEur_list <- c("Armenia", "Azerbaijan", "Belarus", 
                   "Georgia", "Moldova", "Republic of Moldova",
-                  "Russia", "Russian Federation", "Ukraine", "USSR")
+                  "Russia", "Russian Federation", "Ukraine")
 WestEur_list <- c("Austria", "Belgium", "Cyprus", "Denmark", "Finland", "France",
                   "Germany", "Greece", "Iceland", "Ireland", "Italy", 
                   "Luxembourg", "Malta", "Netherlands", "Norway", "Portugal",
                   "Spain", "Sweden", "Switzerland", 
                   "United Kingdom of Great Britain and Northern Ireland", "UK",
                   "Monaco", "Liechtenstein", "Andorra", "German Federal Republic",
-                  "Czech Republic", "San Marino", "United Kingdom")
+                  "San Marino", "United Kingdom")
 
 # used the above region list vectors in a case_when expression to add a new 
 # column of 'region' to the data set, and removed columns that wouldn't be 
@@ -355,15 +356,42 @@ topic_percent_c <- topic_country %>%
             region = unique(region),
             .groups = "drop")
 
-# pivot longer the military expenditure data and add region identifiers
+# pivot longer the military expenditure data and rename countries
+# in the mil_ex data so they would map onto their corresponding ones in the
+# un data
+
+clean_mil_ex_c <- mil_ex %>%
+  pivot_longer(names_to = "year", values_to = "mil_ex_gdp", 
+               cols = '1949':'2019', 
+               names_repair = "minimal") %>%
+  mutate(country = 
+           str_replace_all(country, 
+                           c("Central African Rep." = "Central African Republic",
+                             "Congo, Republic of" = "Congo",
+                             "Congo, Dem. Rep." = "Democratic Republic of the Congo",
+                             "Cote d'Ivoire" = "Ivory Coast",
+                             "Korea, South" = "South Korea",
+                             "Timor-Leste" = "East Timor",
+                             "Trinidad & Tobago" = "Trinidad and Tobago",
+                             "USA" = "United States of America",
+                             "Korea, North" = "North Korea",
+                             "German DR" = "German Democratic Republic",
+                             "Dominican Rep." = "Dominican Republic",
+                             "UK" = "United Kingdom",
+                             "Czechia" = "Czech Republic",
+                             "UAE" = "United Arab Emirates",
+                             "North Macedonia" = "Macedonia",
+                             "Yemen, North" = "Yemen Arab Republic",
+                             "Eswatini" = "Swaziland",
+                             "Czech Republic" = "Czechia",
+                             "Viet Nam" = "Vietnam")))
+
+# add region identifiers
 # then filter out unclassified countries to remove the region rows of the
 # original dataset (which aren't included in my custom region lists,
 # e.g. MENA_list doesn't contain "Middle East")
 
-clean_mil_ex <- mil_ex %>%
-  pivot_longer(names_to = "year", values_to = "mil_ex_gdp", 
-               cols = '1949':'2019', 
-               names_repair = "minimal") %>%
+clean_mil_ex <- clean_mil_ex_c %>%
   mutate(region = case_when(
     country %in% MENA_list ~ "MENA",
     country %in% SubSah_list ~ "SubSah", 
@@ -468,35 +496,12 @@ un_mil_issue1 <- full_join(topics_un_data, military_exp, by = c("region", "year"
 un_mil_issue <- full_join(un_mil_issue1, milit_data_prop, by = c("region", "year")) %>%
   filter(region != "unclassified")
 
-# un and mil data including issues and country level, also renamed countries
-# in the clean_mil_ex data so they would map onto their corresponding ones in the
-# un data
 
-clean_mil_ex_c <- clean_mil_ex %>%
-  mutate(country = 
-           str_replace_all(country, 
-                           c("Central African Rep." = "Central African Republic",
-                             "Congo, Republic of" = "Congo",
-                             "Congo, Dem. Rep." = "Democratic Republic of the Congo",
-                             "Côte d'Ivoire" = "Ivory Coast",
-                             "Korea, South" = "South Korea",
-                             "Trinidad & Tobago" = "Trinidad and Tobago",
-                             "USA" = "United States of America",
-                             "Korea, North" = "North Korea",
-                             "German DR" = "German Democratic Republic",
-                             "Dominican Rep." = "Dominican Republic",
-                             "UK" = "United Kingdom",
-                             "Czechia" = "Czech Republic",
-                             "UAE" = "United Arab Emirates",
-                             "North Macedonia" = "The former Yugoslav 
-                               Republic of Macedonia",
-                             "Yemen, North" = "Yemen Arab Republic",
-                             "Eswatini" = "Swaziland")))
 
 # join the country level topic voting data with the country-level military
 # expenditure data, as reliability no longer needs to be measured
 
-country_mil_issue1 <- full_join(topic_percent_c, clean_mil_ex_c, 
+country_mil_issue1 <- full_join(topic_percent_c, clean_mil_ex, 
                                 by = c("country", "year", "region")) %>%
     filter(region != "unclassified")
 
