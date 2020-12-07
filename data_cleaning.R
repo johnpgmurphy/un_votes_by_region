@@ -383,7 +383,6 @@ clean_mil_ex_c <- mil_ex %>%
                              "North Macedonia" = "Macedonia",
                              "Yemen, North" = "Yemen Arab Republic",
                              "Eswatini" = "Swaziland",
-                             "Czech Republic" = "Czechia",
                              "Viet Nam" = "Vietnam")))
 
 # add region identifiers
